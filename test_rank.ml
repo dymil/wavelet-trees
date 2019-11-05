@@ -15,11 +15,8 @@ let () = Random.self_init () in
                         f n []) n) sizes in
     let naive_rank bv i =
       let rec rank_h j =
-        if j = -1 then 0 else
-          let r = (bv_get_bit bv j) + (rank_h @@ j - 1) in
-          (Printf.printf "get=%B, j=%d, r=%d\t" (Bitv.get bv j) j r;
-          r) in
-      (Printf.printf "\n\n"; rank_h @@ i+1) in
+        if j = -1 then 0 else (bv_get_bit bv j) + (rank_h @@ j - 1) in
+      rank_h @@ i-1 in
     let naives = List.map (fun bv -> let rands = Array.init n_ops @@ (fun x -> let rand = 2 (*Random.int @@ Bitv.length bv*) in (rand, naive_rank bv rand)) in
                                      (bv, rands)) bvs in
     List.iter (fun (bv, rands)  ->
@@ -31,6 +28,6 @@ let () = Random.self_init () in
         for j = 0 to n_ops - 1 do
           Printf.printf "len=%d, i=%d\n" (Bitv.length bv) @@ fst rands.(j);
           let res = r#rank1 @@ fst rands.(j) in
-          OUnit2.assert_equal ~printer:string_of_int res @@ snd rands.(j)
+          OUnit2.assert_equal ~printer:string_of_int (snd rands.(j)) res
         done; Printf.printf "Execution time %f sec, overhead %d bits" (Unix.gettimeofday() -. start) r#overhead
       ) naives
