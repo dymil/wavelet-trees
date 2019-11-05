@@ -24,38 +24,47 @@ class rank_support bv =
       let arr = create (dim * r_s_el_size + max 0 (Sys.int_size - r_s_el_size)) false in
       (for j = 1 to dim - 1 do
          let cum_rank =
-           let rec rank k = if k = j*s then
+           let rec rank k = bv_get_bit bv k + if k = (j-1)*s then
                               bv_get_int arr (j-1) r_s_el_size else
-                              rank (k-1) + bv_get_bit bv k
-           in rank (j*s) in
+                              rank (k-1)
+           in rank @@ j*s - 1 in
+         Printf.printf "%d:%d " j cum_rank;
          bv_set_int cum_rank arr j r_s_el_size
        done; arr)
-        val r_b =
-          let dim = (b - 1 + length bv) / b in
-          let arr = create (dim * r_b_el_size + max 0 (Sys.int_size - r_b_el_size)) false in
-          (for j = 1 to dim - 1 do
-             let local_rank =
-               let rec rank k = if k mod (s/b) = 0 then 0 else
-                                  if k = (j - 1) * b then bv_get_int arr (j-1) r_b_el_size
-                                  else rank (k-1) + bv_get_bit bv k in rank (j*b) in
-             bv_set_int local_rank arr j r_b_el_size
-           done; arr)
+    val r_b =
+      let dim = (b - 1 + length bv) / b in
+      let arr = create (dim * r_b_el_size + max 0 (Sys.int_size - r_b_el_size)) false in
+      (for j = 1 to dim - 1 do
+         let local_rank =
+           let rec rank k = if k mod (s/b) = 0 then bv_get_bit bv k else
+                              if k = (j - 1) * b then bv_get_int arr (j-1) r_b_el_size
+                              else rank (k-1) + bv_get_bit bv k in
+           rank @@ j*b - 1 in
+         bv_set_int local_rank arr j r_b_el_size
+       done; arr)
         (* note r_p is done in little endian order as opposed to the examples *)
-        val r_p =
-          let dim1 = 1 lsl b and
-              dim2 = b in
-          let arr = create (dim1 * dim2 * r_p_el_size + max 0 (Sys.int_size - r_p_el_size)) false in
-          let () = Printf.printf "dim1=%d, dim2=%d length=%d\n" dim1 dim2 @@ length arr in
+    val r_p =
+      let dim1 = 1 lsl b and
+          dim2 = b in
+      let arr = create (dim1 * dim2 * r_p_el_size + max 0 (Sys.int_size - r_p_el_size)) false in
+      let () = Printf.printf "dim1=%d, dim2=%d length=%d\n" dim1 dim2 @@ length arr in
       (for i = 1 to dim1 - 1 do
          bv_set_int (i mod 2) arr (i * dim2) r_p_el_size;
          for j = 1 to dim2 - 1 do
            bv_set_int ((i lsr j mod 2) + bv_get_int arr (i * dim2 + j - 1) r_p_el_size) arr (i * dim2 + j) r_p_el_size
          done
        done; arr)
-        (*i is 1-indexed; rank is inclusive here*)
-        method rank1 i = let i = i+1 in let bv' = append bv @@ create (Sys.int_size - 1) true in
-                         Printf.printf "rank1: r_s=%d, r_b=%d, r_p=%d\n" (length r_s) (length r_b) (length r_p); let block_idx = (i - 1) / b in
-                                                                                                                 bv_get_int r_s ((i - 1) / s) r_s_el_size + bv_get_int r_b block_idx r_b_el_size + bv_get_int r_p (bv_get_chunk bv' (block_idx * b) (i - block_idx * b)) r_p_el_size
-        method rank0 i = i - (self#rank1 i)
-        method overhead = length r_s + length r_b + length r_p
+    (*i is 1-indexed; rank is inclusive here*)
+    method rank1 i =
+      let bv' = append bv @@ create (Sys.int_size - 1) false in
+      let block_idx = (i - 1) / b in
+      let r_s_comp = bv_get_int r_s ((i - 1) / s) r_s_el_size and
+          r_b_comp = bv_get_int r_b block_idx r_b_el_size and
+          r_p_comp = bv_get_int r_p (bv_get_chunk bv' (block_idx * b) (i - block_idx * b)) r_p_el_size in
+      Printf.printf "rank1: r_s: s=%d, comp=%d; r_b: b=%d, comp=%d; r_p: l=%d, comp=%d block_idx=%d\n" s r_s_comp b r_b_comp (length r_p) r_p_comp block_idx;
+      r_s_comp + r_b_comp + r_p_comp
+    method rank0 i = i - (self#rank1 i)
+    method overhead = length r_s + length r_b + length r_p
   end
+    
+    
