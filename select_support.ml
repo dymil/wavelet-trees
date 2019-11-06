@@ -1,7 +1,16 @@
 
-class select_support rank_sup =
+class select_support bv =
 object(self)
-  val rank_sup = rank_sup
-  method select1 i = ()
-  method select0 i = ()
-  method overhead = rank_sup#overhead
+  inherit Rank_support.rank_support bv
+  method private select i b =
+    let rec bsearch low high =
+      if low > high then None else
+      let mid = (low + high) / 2 in
+      let rank = if b then self#rank1 mid else self#rank0 mid in
+      if rank = i && b = Bitv.get bv mid then Some mid
+      else if rank > i || (rank = i && b <> Bitv.get bv i) then bsearch low @@ mid - 1
+      else bsearch (mid + 1) high in
+    bsearch 0 @@ Bitv.length bv - 1
+  method select1 i = self#select i true
+  method select0 i = self#select i false
+end
