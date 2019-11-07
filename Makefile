@@ -1,7 +1,7 @@
 
 all: test
 
-test: rank_support.cmo test_rank.cmo rank_support.cmi select_support.cmi select_support.cmo test_rank.cmi
+test: rank_support.cmo rank_support.cmi select_support.cmo select_support.cmi test_rank.cmo test_rank.cmi
 	ocamlfind ocamlc -g -linkpkg -package Bitv,OUnit2 rank_support.cmo select_support.cmo test_rank.cmo -o test
 
 test_rank.cmo: test_rank.ml rank_support.ml select_support.ml
