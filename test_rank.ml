@@ -1,4 +1,5 @@
 let () = Random.self_init () in
+    Printf.printf "==Rank==\n";
     let bv_get_bit arr idx = if (Bitv.get arr idx) then 1 else 0 and
         n_ops = 1000 in
     let sizes = [(*1; 2; *)4; 8; 16; 128; 256; 31; 33; 65] in
@@ -32,6 +33,7 @@ let () = Random.self_init () in
       ) naives
     
 let () =
+  Printf.printf "==Select==\n";
   let n_ops = 1000 and
       sizes = [(*1; 2; *)4; 8; 16; 128; 256; 31; 33; 65] in
   let bvs = [Bitv.of_int_us @@ Random.bits ();
