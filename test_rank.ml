@@ -50,9 +50,9 @@ let () =
            let rec help idx acc =
              if idx = Bitv.length bv then None else
                let bit = Bitv.get bv idx in
-               if acc + (if bit = b then 1 else 0)
-                  = i then Some idx else
-                 let res = help (idx + 1) acc in
+               let acc' = acc + (if bit = b then 1 else 0) in
+               if acc' = i then Some idx else
+                 let res = help (idx + 1) acc' in
                  if Option.is_some res then Some(Option.get res + if bit = b then 1 else 0) else None in
            help 0 0 in
          let naives = List.map (fun bv ->
@@ -62,17 +62,22 @@ let () =
                               and bit = Random.bool () in
                               (rand, bit, naive_select bv rand bit)) in
                           (bv, rands)) bvs in
-    List.iter (fun (bv, rands)  ->
-        (*Printf.printf "\n"; for j = 0 to Bitv.length bv - 1 do
-          Printf.printf "%d" (if (Bitv.get bv j) then 1 else 0)
-        done; Printf.printf "\n";*)
-        let s = new Select_support.select_support bv in
-        let start = Unix.gettimeofday() in
-        for j = 0 to n_ops - 1 do
-          match rands.(j) with
-          |(rand, bit, naive) ->
-            (*Printf.printf "len=%d, i=%d\n" (Bitv.length bv) @@ fst rands.(j);*)
-            let res = (if bit then s#select1 rand else s#select0 rand) in
-            OUnit2.assert_equal naive res
-        done; Printf.printf "Bitv length: %d, Execution time: %f sec, overhead: %d bits\n" (Bitv.length bv) (Unix.gettimeofday() -. start) s#overhead
-      ) naives
+         List.iter (fun (bv, rands)  ->
+             Printf.printf "\n";
+             for j = 0 to Bitv.length bv - 1 do
+               Printf.printf "%d" (if (Bitv.get bv j) then 1 else 0)
+             done; Printf.printf "\n";
+             let s = new Select_support.select_support bv in
+             let start = Unix.gettimeofday() in
+             for j = 0 to n_ops - 1 do
+               match rands.(j) with
+               |(rand, bit, naive) ->
+                 Printf.printf "len=%d, i=%d, bit=%B\n" (Bitv.length bv) rand bit;
+                 let res = (if bit then s#select1 rand else s#select0 rand) in
+                 let opt_to_int = function
+                   |Some n -> n
+                   |None -> -1 in
+            OUnit2.assert_equal ~printer:string_of_int (opt_to_int naive) (opt_to_int res)
+             done; Printf.printf "Bitv length: %d, Execution time: %f sec, overhead: %d bits\n" (Bitv.length bv) (Unix.gettimeofday() -. start) s#overhead
+           ) naives
+           

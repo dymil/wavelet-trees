@@ -7,10 +7,10 @@ object(self)
       if low > high then None else
       let mid = (low + high) / 2 in
       let rank = if b then self#rank1 mid else self#rank0 mid in
-      if rank = i && b = Bitv.get bv mid then Some mid
-      else if rank > i || (rank = i && b <> Bitv.get bv i) then bsearch low @@ mid - 1
+      if rank = i && b = Bitv.get bv @@ mid-1 then Some mid
+      else if rank > i || (rank = i && b <> Bitv.get bv @@ mid-1) then bsearch low @@ mid - 1
       else bsearch (mid + 1) high in
-    bsearch 0 @@ Bitv.length bv - 1
+    bsearch 1 @@ Bitv.length bv
   method select1 i = self#select i true
   method select0 i = self#select i false
 end
