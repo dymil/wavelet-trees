@@ -1,13 +1,13 @@
 let () = Random.self_init () in
     Printf.printf "==Rank==\n";
     let bv_get_bit arr idx = if (Bitv.get arr idx) then 1 else 0 and
-        n_ops = 1000 in
-    let sizes = [(*1; 2; *)4; 8; 16; 128; 256; 31; 33; 65] in
-    let bvs = [Bitv.of_int_us @@ Random.bits ();
+        n_ops = 10 in
+    let sizes = [(*1; 2; *)4; (*8; 16; 128; 256; 31; 33; 65*)] in
+    let bvs = (*[Bitv.of_int_us @@ Random.bits ();
                Bitv.of_int32_us @@ Random.int32 @@ Int32.max_int;
                Bitv.of_nativeint_us @@ Random.nativeint @@ Nativeint.max_int;
                Bitv.of_int64_us @@ Random.int64 Int64.max_int]
-              @ List.map (fun n ->
+              @*) List.map (fun n ->
                     Bitv.of_list_with_length (
                         let rec f k l =
                           if k = 0 then l else
@@ -17,8 +17,12 @@ let () = Random.self_init () in
       let rec rank_h j =
         if j = -1 then 0 else (bv_get_bit bv j) + (rank_h @@ j - 1) in
       rank_h @@ i-1 in
-    let naives = List.map (fun bv -> let rands = Array.init n_ops @@ (fun x -> let rand = 1 + (Random.int @@ Bitv.length bv - 1) in (rand, naive_rank bv rand)) in
-                                     (bv, rands)) bvs in
+    let naives = List.map (fun bv ->
+                     let rands = Array.init n_ops @@ (fun x ->
+                         let rand = 1 + (Random.int @@ Bitv.length bv) in
+                         Printf.printf "%d\n" rand;
+                         (rand, naive_rank bv rand)) in
+                     (bv, rands)) bvs in
     List.iter (fun (bv, rands)  ->
         (*Printf.printf "\n"; for j = 0 to Bitv.length bv - 1 do
           Printf.printf "%d" (if (Bitv.get bv j) then 1 else 0)
@@ -35,12 +39,12 @@ let () = Random.self_init () in
 let () =
   Printf.printf "==Select==\n";
   let n_ops = 1000 and
-      sizes = [(*1; 2; *)4; 8; 16; 128; 256; 31; 33; 65] in
-  let bvs = [Bitv.of_int_us @@ Random.bits ();
+      sizes = [(*1; 2; *)4;(* 8; 16; 128; 256; 31; 33; 65*)] in
+  let bvs = (*[Bitv.of_int_us @@ Random.bits ();
              Bitv.of_int32_us @@ Random.int32 @@ Int32.max_int;
              Bitv.of_nativeint_us @@ Random.nativeint @@ Nativeint.max_int;
                     Bitv.of_int64_us @@ Random.int64 Int64.max_int]
-                   @ List.map (fun n ->
+                   @*) List.map (fun n ->
                          Bitv.of_list_with_length (
                              let rec f k l =
                                if k = 0 then l else
@@ -48,13 +52,13 @@ let () =
                              f n []) n) sizes in
          let naive_select bv i b =
            let rec help idx acc =
-             if idx = Bitv.length bv then None else
-               let bit = Bitv.get bv idx in
+             if idx > Bitv.length bv then None else
+               let bit = Bitv.get bv (idx - 1) in
                let acc' = acc + (if bit = b then 1 else 0) in
                if acc' = i then Some idx else
                  let res = help (idx + 1) acc' in
                  if Option.is_some res then Some(Option.get res + if bit = b then 1 else 0) else None in
-           help 0 0 in
+           help 1 0 in
          let naives = List.map (fun bv ->
                           let rands =
                             Array.init n_ops @@ (fun x ->
