@@ -9,9 +9,10 @@ class rank_support bv =
       b = x / 2 (*int_of_float @@ ceil @@ log2_n /. 2.0*) and
       bv_get_chunk arr idx len =
         to_int_us @@ (* should be constant-ish time *)
-          let arr' = (*Printf.printf "bvlen=%d, idx=%d, size=%d\n" (length arr) idx len;*) (sub arr idx Sys.int_size) in
+          let arr' = (*Printf.printf "bvlen=%d, idx=%d, size=%d\n" (length arr) idx len;*) sub arr idx Sys.int_size in
           fill arr' len (Sys.int_size - len) false; arr' in
   let bv_get_int arr idx size =
+    (*Printf.printf "get_int idx=%d size=%d\n" idx size;*)
     bv_get_chunk arr (idx * size) size and
       bv_get_bit arr idx = if get arr idx then 1 else 0 and
       bv_set_int v arr idx size = blit (of_int_us v) 0 arr (idx * size) size in
@@ -20,8 +21,8 @@ class rank_support bv =
       r_p_el_size = int_of_float @@ ceil @@ log2 @@ b + 1 in
   object(self)
     val r_s =
-      let dim = (s - 1 + length bv) / s in
-      let arr = create (dim * r_s_el_size + max 0 (Sys.int_size - r_s_el_size)) false in
+      let dim = (2*s - 1 + length bv) / s in
+      let arr = create (dim * r_s_el_size + max 0 (Sys.int_size - r_s_el_size + 2)) false in
       (for j = 1 to dim - 1 do
          let cum_rank =
            let rec rank k = bv_get_bit bv k + if k = (j-1)*s then
@@ -33,7 +34,7 @@ class rank_support bv =
        done; arr)
     val r_b =
       let dim = (b - 1 + length bv) / b in
-      let arr = create (dim * r_b_el_size + max 0 (Sys.int_size - r_b_el_size)) false in
+      let arr = create (dim * r_b_el_size + max 0 (Sys.int_size - r_b_el_size + 1)) false in
       (for j = 1 to dim - 1 do
          let local_rank =
            let rec rank k = if k mod s = 0 then 0 else
@@ -56,19 +57,18 @@ class rank_support bv =
        done; arr)
     (*i is 1-indexed; rank is inclusive here*)
     method rank1 i =
-      let (*print_bv name bv size dim = Printf.printf "%s " name; for i = 0 to dim - 1 do
+      let print_bv name bv size dim = Printf.printf "%s " name; for i = 0 to dim - 1 do
                           Printf.printf "%d " @@ bv_get_int bv i size
-                        done; Printf.printf "\n" and*)
-          bv' = append bv @@ create (Sys.int_size - 1) false in
-      (*print_bv "r_s" r_s r_s_el_size ((s - 1 + length bv) / s) ; print_bv "r_b" r_b r_b_el_size ((b - 1 + length bv) / b); print_bv "r_p" r_p r_p_el_size ((1 lsl b) * b);*)
+                        done; Printf.printf "\n" and
+          bv' = append bv @@ create (Sys.int_size) false in
+      print_bv "r_s" r_s r_s_el_size ((2*s - 1 + length bv) / s); print_bv "r_b" r_b r_b_el_size ((b - 1 + length bv) / b); print_bv "r_p" r_p r_p_el_size ((1 lsl b) * b);
       let block_idx = i / b in
+      (*Printf.printf "block_idx=%d, b=%d, len bv'=%d, len r_p=%d\n" block_idx b (length bv') (length r_p);*)
       let r_s_comp = bv_get_int r_s (i / s) r_s_el_size and
           r_b_comp = bv_get_int r_b block_idx r_b_el_size and
           r_p_comp = bv_get_int r_p (i - block_idx * b + b * (bv_get_chunk bv' (block_idx * b) (max 0 @@ i - block_idx * b))) r_p_el_size in
-      (*Printf.printf "rank1: r_s: s=%d, comp=%d; r_b: b=%d, comp=%d; r_p: l=%d, comp=%d block_idx=%d\n" s r_s_comp b r_b_comp (length r_p) r_p_comp block_idx;*)
+      Printf.printf "rank1: i=%d, r_s: s=%d, comp=%d; r_b: b=%d, comp=%d; r_p: l=%d, comp=%d block_idx=%d\n" i s r_s_comp b r_b_comp (length r_p) r_p_comp block_idx;
       r_s_comp + r_b_comp + r_p_comp
     method rank0 i = i - (self#rank1 i)
     method overhead = length r_s + length r_b + length r_p
   end
-    
-    
