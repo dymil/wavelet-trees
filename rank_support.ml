@@ -57,9 +57,10 @@ class rank_support bv =
        done; arr)
     (*i is 1-indexed; rank is inclusive here*)
     method rank1 i =
-      let print_bv name bv size dim = Printf.printf "%s " name; for i = 0 to dim - 1 do
-                          Printf.printf "%d " @@ bv_get_int bv i size
-                        done; Printf.printf "\n" and
+      let print_bv name bv size dim =
+        Printf.printf "%s " name; for i = 0 to dim - 1 do
+                                    Printf.printf "%d " @@ bv_get_int bv i size
+                                  done; Printf.printf "\n" and
           bv' = append bv @@ create (Sys.int_size) false in
       print_bv "r_s" r_s r_s_el_size ((2*s - 1 + length bv) / s); print_bv "r_b" r_b r_b_el_size ((b - 1 + length bv) / b); print_bv "r_p" r_p r_p_el_size ((1 lsl b) * b);
       let block_idx = i / b in

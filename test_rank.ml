@@ -2,7 +2,7 @@ let () = Random.self_init () in
     Printf.printf "==Rank==\n";
     let bv_get_bit arr idx = if (Bitv.get arr idx) then 1 else 0 and
         n_ops = 5 in
-    let sizes = [(*1; 2; *)4; (*8; 16; 128; 256; 31; 33; 65*)] in
+    let sizes = [(*1; 2; 3;*)4; (*5;*) 29; (*8; 16; 128; 256; 31; 33; 65*)] in
     let bvs = (*[Bitv.of_int_us @@ Random.bits ();
                Bitv.of_int32_us @@ Random.int32 @@ Int32.max_int;
                Bitv.of_nativeint_us @@ Random.nativeint @@ Nativeint.max_int;
@@ -26,7 +26,6 @@ let () = Random.self_init () in
         Printf.printf "\n"; for j = 0 to Bitv.length bv - 1 do
           Printf.printf "%d" (if (Bitv.get bv j) then 1 else 0)
                             done; Printf.printf "\n";
-        
         let r = new Rank_support.rank_support bv in
         let start = Unix.gettimeofday() in
         for j = 0 to n_ops - 1 do
@@ -36,7 +35,7 @@ let () = Random.self_init () in
         done; Printf.printf "Bitv length: %d, Execution time: %f sec, overhead: %d bits\n" (Bitv.length bv) (Unix.gettimeofday() -. start) r#overhead
       ) naives
     
-let () =
+let bla () =
   Printf.printf "==Select==\n";
   let n_ops = 1000 and
       sizes = [(*1; 2; *)4;(* 8; 16; 128; 256; 31; 33; 65*)] in
