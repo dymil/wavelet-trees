@@ -6,7 +6,6 @@ object(self)
     let rec bsearch low high =
       if low > high then None else
         let mid = (low + high) / 2 in
-        Printf.printf "mid=%d\n" mid;
         let rank = if b then self#rank1 mid else self#rank0 mid in
         if rank = i && b = Bitv.get bv @@ mid - 1 then Some mid
         else if rank > i || (rank = i && (b <> Bitv.get bv @@ mid - 1)) then bsearch low @@ mid - 1
