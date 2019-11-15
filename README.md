@@ -1,2 +1,2 @@
 # HW1
-OCaml implementations of succinct rank/select and wavelet trees, wrapping the bitv library
+OCaml implementations of succinct bitvector rank/select and wavelet trees, wrapping the bitv library
