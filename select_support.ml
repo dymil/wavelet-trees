@@ -1,4 +1,3 @@
-
 class select_support bv =
 object(self)
   inherit Rank_support.rank_support bv
