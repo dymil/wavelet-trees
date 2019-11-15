@@ -1,5 +1,5 @@
 open Bitv
-   
+
 class rank_support bv =
   let log2 a = log (float_of_int a) /. log 2.0 in
   let log2_n = log2 @@ length bv in
