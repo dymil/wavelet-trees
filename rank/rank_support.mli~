@@ -1,0 +1,5 @@
+type t
+
+val create Bitv.t -> t
+
+                       
