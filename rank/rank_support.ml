@@ -66,13 +66,12 @@ let create bv =
           for j = 1 to dim2 - 1 do
             bv_set_int ((i lsr j mod 2) + bv_get_int arr (i * dim2 + j - 1) r_p_el_size) arr (i * dim2 + j) r_p_el_size
           done
-       done; arr and
-     bv' = bv in
+       done; arr in
   {
     r_s = r_s;
     r_b = r_b;
     r_p = r_p;
-    bv' = bv';
+    bv' = bv;
   }
   
 let rank1 r j =
@@ -85,21 +84,21 @@ let rank1 r j =
   let r_s_el_size = int_of_float @@ ceil @@ log2_n and
       r_b_el_size = int_of_float @@ 0.1 +. (ceil @@ log2 @@ s) and
       r_p_el_size = int_of_float @@ 0.1 +. (ceil @@ log2 @@ b + 1) and
-      dim_r_b = (b - 1 + length r.bv') / b and
-      dim_r_s = (s - 1 + length r.bv') / s in
+      dim_r_b = (b - 1 + length r.bv') / b in
+  (*    dim_r_s = (s - 1 + length r.bv') / s in
   let print_bv name bv size dim =
     Printf.printf "%s " name; for i = 0 to dim - 1 do
                                 Printf.printf "%d " @@ bv_get_int bv i size
                               done; Printf.printf "\n" in
-  print_bv "r_s" r.r_s r_s_el_size dim_r_s; print_bv "r_b" r.r_b r_b_el_size ((b - 1 + length r.bv') / b); print_bv "r_p" r.r_p r_p_el_size ((1 lsl b) * b);     
+  print_bv "r_s" r.r_s r_s_el_size dim_r_s; print_bv "r_b" r.r_b r_b_el_size ((b - 1 + length r.bv') / b); print_bv "r_p" r.r_p r_p_el_size ((1 lsl b) * b);     *)
   let rank1_h i = 
     let block_idx = i / b in
     let r_s_comp = bv_get_int r.r_s (i / s) r_s_el_size and
         r_b_comp = bv_get_int r.r_b block_idx r_b_el_size and
         r_p_comp = bv_get_int r.r_p (i - block_idx * b + b * (bv_get_chunk r.bv' (block_idx * b) (max 0 @@ i - block_idx * b))) r_p_el_size in
-      Printf.printf "rank1: r_s: s=%d, comp=%d; r_b: b=%d, comp=%d; r_p: l=%d, comp=%d block_idx=%d\n" s r_s_comp b r_b_comp (length r.r_p) r_p_comp block_idx;
+    (*Printf.printf "rank1: r_s: s=%d, comp=%d; r_b: b=%d, comp=%d; r_p: l=%d, comp=%d block_idx=%d\n" s r_s_comp b r_b_comp (length r.r_p) r_p_comp block_idx;*)
       r_s_comp + r_b_comp + r_p_comp in
-    if j = length r.bv' - Sys.int_size && j / b = dim_r_b then bv_get_bit r.bv' (j - 1) + rank1_h (j - 1) else rank1_h j
+    if j = length r.bv' && j / b = dim_r_b then bv_get_bit r.bv' (j - 1) + rank1_h (j - 1) else rank1_h j
     
 let rank0 r i = i - rank1 r i
               

@@ -10,7 +10,7 @@ let select b s i =
       if rank = i && b = Bitv.get s.bv' @@ mid - 1 then Some mid
       else if rank > i || (rank = i && (b <> Bitv.get s.bv' @@ mid - 1)) then bsearch low @@ mid - 1
       else bsearch (mid + 1) high in
-  bsearch 1 @@ (Bitv.length s.bv' - Sys.int_size)
+  bsearch 1 @@ Bitv.length s.bv'
   
 let select1 = select true
 
