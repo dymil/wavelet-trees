@@ -2,7 +2,6 @@ type t = {
     r_s : Bitv.t;
     r_b : Bitv.t;
     r_p : Bitv.t ;
-    bv' : Bitv.t;
   }
        
 open Bitv
@@ -71,12 +70,11 @@ let create bv =
     r_s = r_s;
     r_b = r_b;
     r_p = r_p;
-    bv' = bv;
   }
   
-let rank1 r j =
+let rank1 r bv j =
   let log2 a = log (float_of_int a) /. log 2.0 in
-  let log2_n = log2 @@ length r.bv' in
+  let log2_n = log2 @@ length bv in
   let x = int_of_float log2_n in
   (* do logs early so that s/b = int(log2 n) or int(log2 n) - 1) is nice *)
   let s = x * x / 2 and
@@ -84,7 +82,7 @@ let rank1 r j =
   let r_s_el_size = int_of_float @@ ceil @@ log2_n and
       r_b_el_size = int_of_float @@ 0.1 +. (ceil @@ log2 @@ s) and
       r_p_el_size = int_of_float @@ 0.1 +. (ceil @@ log2 @@ b + 1) and
-      dim_r_b = (b - 1 + length r.bv') / b in
+      dim_r_b = (b - 1 + length bv) / b in
   (*    dim_r_s = (s - 1 + length r.bv') / s in
   let print_bv name bv size dim =
     Printf.printf "%s " name; for i = 0 to dim - 1 do
@@ -95,12 +93,11 @@ let rank1 r j =
     let block_idx = i / b in
     let r_s_comp = bv_get_int r.r_s (i / s) r_s_el_size and
         r_b_comp = bv_get_int r.r_b block_idx r_b_el_size and
-        r_p_comp = bv_get_int r.r_p (i - block_idx * b + b * (bv_get_chunk r.bv' (block_idx * b) (max 0 @@ i - block_idx * b))) r_p_el_size in
+        r_p_comp = bv_get_int r.r_p (i - block_idx * b + b * (bv_get_chunk bv (block_idx * b) (max 0 @@ i - block_idx * b))) r_p_el_size in
     (*Printf.printf "rank1: r_s: s=%d, comp=%d; r_b: b=%d, comp=%d; r_p: l=%d, comp=%d block_idx=%d\n" s r_s_comp b r_b_comp (length r.r_p) r_p_comp block_idx;*)
       r_s_comp + r_b_comp + r_p_comp in
-    if j = length r.bv' && j / b = dim_r_b then bv_get_bit r.bv' (j - 1) + rank1_h (j - 1) else rank1_h j
+    if j = length bv && j / b = dim_r_b then bv_get_bit bv (j - 1) + rank1_h (j - 1) else rank1_h j
     
-let rank0 r i = i - rank1 r i
+let rank0 r bv i = i - rank1 r bv i
               
-let overhead r =
-  length r.r_s + length r.r_b + length r.r_p + length r.bv'
+let overhead r = length r.r_s + length r.r_b + length r.r_p
