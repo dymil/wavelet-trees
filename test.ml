@@ -3,7 +3,8 @@ let () = Random.self_init () in
     let gen_bv n = Bitv.init n @@ fun _ -> Random.bool () and
         bv_get_bit arr idx = if (Bitv.get arr idx) then 1 else 0 and
         n_ops = 1000 in
-    let sizes = [(*1; 2; 3;*) 4; 5; 8; 16; 29; 33; 65; 128; 200; 256; 400; 512; 1000; 1024; 2000; 2048; 4000; 4096; 8000; 8192] @ List.init 20 (fun _ -> Random.int 40000) in
+    let sizes = [(*1; 2; 3;*) 4; 5; 8; 16; 29; 33; 65; 128; 200; 256; 400; 512; 1000; 1024; 2000; 2048; 4000; 4096; 8000; 8192]
+                @ List.init 20 (fun _ -> Random.int 40000) in
     let bvs = [Bitv.of_int_us @@ Random.bits ();
                Bitv.of_int32_us @@ Random.int32 @@ Int32.max_int;
                Bitv.of_int64_us @@ Random.int64 Int64.max_int]
@@ -26,7 +27,9 @@ let () = Random.self_init () in
         for j = 0 to n_ops - 1 do
           let res = Rank_support.rank1 r @@ fst rands.(j) in
           OUnit2.assert_equal ~printer:string_of_int (snd rands.(j)) res
-        done; Printf.printf "Bitv length: %d, Execution time: %f ms, overhead: %d bits\n" (Bitv.length bv) (1000. *. (Unix.gettimeofday() -. start)) @@ Rank_support.overhead r
+        done;
+        Printf.printf "Bitv length: %d, Execution time: %f ms, overhead: %d bits\n"
+          (Bitv.length bv) (1000. *. (Unix.gettimeofday() -. start)) @@ Rank_support.overhead r
       ) naives;
     Printf.printf "==Select==\n";
     let naive_select bv i b =
@@ -59,5 +62,7 @@ let () = Random.self_init () in
               |Some n -> n
               |None -> -1 in
             OUnit2.assert_equal ~printer:string_of_int (opt_to_int naive) (opt_to_int res)
-        done; Printf.printf "Bitv length: %d, Execution time: %f ms, overhead: %d bits\n" (Bitv.length bv) (1000. *. (Unix.gettimeofday() -. start)) @@ Select_support.overhead s
+        done;
+        Printf.printf "Bitv length: %d, Execution time: %f ms, overhead: %d bits\n"
+          (Bitv.length bv) (1000. *. (Unix.gettimeofday() -. start)) @@ Select_support.overhead s
       ) naives
