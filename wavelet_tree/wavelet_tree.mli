@@ -1,6 +1,7 @@
-type t
+type 'a t
 
-val create : string -> t
+(** Takes a list *)
+val create : 'a list -> t
   
 val access : t -> int -> char
   
