@@ -32,7 +32,8 @@ let create s =
       Node(bv, Rank_support.create bv,
            make_tree left (Bitv.create len_left false) start (mid + 1),
            make_tree right (Bitv.create len_right false) (mid + 1) fin) in
-  (arr, make_tree list (Bitv.create (List.length list) false) 0 (Bitv.length bv))
+  let len = List.length list in
+  (arr, make_tree list (Bitv.create len false) 0 len)
     
 let access wt i = ()
 
