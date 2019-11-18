@@ -28,7 +28,10 @@ let create s =
                               len_left := len_left + 1; true
                             else
                               Bitv.set bv !idx true; false) list' in
-      Node(bv, Rank_support.create bv, make_tree left (Bitv.create len_left false) start (mid + 1), make_tree right (Bitv.create ((Bitv.length bv) - len_left) false) (mid + 1) fin) in
+      let len_right = (Bitv.length bv) - len_left in
+      Node(bv, Rank_support.create bv,
+           make_tree left (Bitv.create len_left false) start (mid + 1),
+           make_tree right (Bitv.create len_right false) (mid + 1) fin) in
   (arr, make_tree list (Bitv.create (List.length list) false))
     
 let access wt i = ()
