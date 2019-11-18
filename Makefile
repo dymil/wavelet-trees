@@ -1,6 +1,6 @@
 all: test
 
-test: rank_support.cmx select_support.cmx test.cmx
+test: rank_support.cmx select_support.cmx wavelet_tree.cmx test.cmx
 	ocamlfind ocamlopt -g -linkpkg -package Bitv,OUnit2 $^ -o $@
 
 test.cmx: test.ml rank/rank_support.mli select/select_support.mli
@@ -17,6 +17,12 @@ select_support.cmi: select/select_support.mli rank/rank_support.mli
 
 select_support.cmx: select/select_support.ml rank_support.cmi select_support.cmi
 	ocamlfind ocamlopt -g -c -linkpkg -package Bitv $< -o $@
+
+wavelet_tree.cmi: wavelet_tree.wavelet_tree.mli
+	ocamlfind ocamlopt -g -c $< -o $@
+
+wavelet_tree.cmx: wavelet_tree/wavelet_tree.ml rank_support.cmi select_support.cmi
+	ocamlfind ocamlopt -g -c $< -o $@
 
 .PHONY: clean
 
