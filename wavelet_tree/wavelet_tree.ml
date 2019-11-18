@@ -3,7 +3,7 @@ module Make(Ord: Set.OrderedType) =
     type elt = Ord.t
              
     (** sorted character alphabet, root node*)
-    type 'a t = 'a array * btree
+    type t = elt array * btree
               
     (** Waste a little extra space including select support, but it just holds pointers to the same arrays as rank support *)
     type btree = Leaf of int | Node of Bitv.t * Rank_support.t * Select_support.t *  btree * btree

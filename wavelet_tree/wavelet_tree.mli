@@ -6,7 +6,7 @@ module type WT =
     type t
     (** The type of wavelet trees. *)
 
-(** Takes a list *)
+    (** Takes a list *)
     val create : elt list -> t
       
     val access : t -> int -> elt
