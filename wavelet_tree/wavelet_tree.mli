@@ -1,4 +1,4 @@
-module type WT =
+module type S =
   sig
     type elt
     (** The type of the wavelet tree elements. *)
@@ -11,9 +11,10 @@ module type WT =
       
     val access : t -> int -> elt
       
-    val rank : t -> elt -> int -> int
+    val rank : t -> elt -> int -> int option
+    (** Returns None if the character isn't in the alphabet *)
       
-    val select : t -> elt -> int -> int
+    val select : t -> elt -> int -> int option
   end
     
-module Make (Ord : Set.OrderedType) : WT with type elt = Ord.t                             
+module Make (Ord : Set.OrderedType) : S with type elt = Ord.t  
