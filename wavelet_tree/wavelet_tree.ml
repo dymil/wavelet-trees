@@ -2,10 +2,12 @@ module type S =
   sig
     type elt
     type t
-    val create : elt list -> t
+    val build : elt list -> t
     val access : t -> int -> elt
     val rank : t -> elt -> int -> int option
     val select : t -> elt -> int -> int option
+    val alphabet_size: t -> int
+    val cardinal : t -> int
   end
 
 module Make(Ord: Set.OrderedType) =
@@ -30,7 +32,7 @@ module Make(Ord: Set.OrderedType) =
         else bsearch arr (mid + 1) high c
         
     (** This is the naive partition-based construction algorithm. *)
-    let create s =
+    let build s =
       let arr = List.sort_uniq Ord.compare s |> List.to_seq |> Array.of_seq in
       let list = List.rev @@ List.rev_map (fun c -> Option.get @@ bsearch arr 0 (Array.length arr) c) s in
       let rec make_tree list' bv start fin =
@@ -107,4 +109,8 @@ module Make(Ord: Set.OrderedType) =
          match wt.root with
          | Leaf _ -> if i > wt.length then None else Some i
          | Node _ -> select_h wt.root 0 (Array.length wt.alphabet) []
+
+    let alphabet_size wt = Array.length wt.alphabet
+
+    let cardinal wt = wt.length
   end

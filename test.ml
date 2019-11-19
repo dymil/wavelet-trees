@@ -78,7 +78,7 @@ let test_select ctx =
         
 let test_wt ctx =
   let module CharWT = Wavelet_tree.Make(Char) in
-  let wt = CharWT.create ("alabar a la alabarda" |> String.to_seq |> List.of_seq) in
+  let wt = CharWT.build ("alabar a la alabarda" |> String.to_seq |> List.of_seq) in
   OUnit2.assert_equal ~printer:string_of_int 5 @@ Option.get @@ CharWT.rank wt 'a' 11;
   OUnit2.assert_equal ~printer:string_of_int 14 @@ Option.get @@ CharWT.select wt 'l' 3;
   OUnit2.assert_equal ~printer:(Printf.sprintf "%c") 'r' @@ CharWT.access wt 6
@@ -108,7 +108,7 @@ let test_wt_rand_rank ctx =
                    (sigma, l, rands)) char_lists in
   let module CharWT = Wavelet_tree.Make(Char) in
   List.iter (fun (sigma, l, rands) ->
-      let wt = CharWT.create l in
+      let wt = CharWT.build l in
       let start = Unix.gettimeofday() in
       List.iter (
           function (c, i, naive) ->
@@ -138,7 +138,7 @@ let test_wt_rand_select ctx =
                    (sigma, l, rands)) char_lists in
     let module CharWT = Wavelet_tree.Make(Char) in
     List.iter (fun (sigma, l, rands) ->
-        let wt = CharWT.create l in
+        let wt = CharWT.build l in
         let start = Unix.gettimeofday() in
         List.iter (
             function (c, i, naive) ->
