@@ -3,7 +3,7 @@ type t = {
     r_b : Bitv.t;
     r_p : Bitv.t ;
   }
-       
+
 open Bitv
 let bv_get_chunk arr idx len =
   to_int_us @@ (* should be constant-ish time *)
@@ -21,7 +21,7 @@ let bv_get_bit arr idx = if get arr idx then 1 else 0
 let create bv =
   let log2 a = log (float_of_int a) /. log 2.0 in
   let log2_n = log2 @@ length bv in
-  let x = int_of_float log2_n in
+  let x = max 2 @@ int_of_float log2_n in
   (* do logs early so that s/b = int(log2 n) or int(log2 n) - 1) is nice *)
   let s = x * x / 2 and
       b = x / 2 (*int_of_float @@ ceil @@ log2_n /. 2.0*) and
@@ -71,17 +71,17 @@ let create bv =
     r_b = r_b;
     r_p = r_p;
   }
-  
+
 let rank1 r bv j =
   let log2 a = log (float_of_int a) /. log 2.0 in
   let log2_n = log2 @@ length bv in
-  let x = int_of_float log2_n in
+  let x = max 2 @@ int_of_float log2_n in
   (* do logs early so that s/b = int(log2 n) or int(log2 n) - 1) is nice *)
   let s = x * x / 2 and
       b = x / 2 (*int_of_float @@ ceil @@ log2_n /. 2.0*) in
   let r_s_el_size = int_of_float @@ ceil @@ log2_n and
-      r_b_el_size = int_of_float @@ 0.1 +. (ceil @@ log2 @@ s) and
-      r_p_el_size = int_of_float @@ 0.1 +. (ceil @@ log2 @@ b + 1) and
+      r_b_el_size = int_of_float @@ ceil @@ log2 s and
+      r_p_el_size = int_of_float @@ ceil @@ log2 @@ b + 1 and
       dim_r_b = (b - 1 + length bv) / b in
   (*    dim_r_s = (s - 1 + length r.bv') / s in
   let print_bv name bv size dim =
