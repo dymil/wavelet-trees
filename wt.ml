@@ -1,5 +1,6 @@
 (** Command-line program which supports serializing and deserializing
-    wavelet trees over a character alphabet. *)
+    wavelet trees over a character alphabet.
+    Note that Bitv is implemented using ints, so serialized files are not portable across 32-bit and 64-bit architectures. *)
 open Printf
 
 let usage_msg = "Usage: wt cmd arg1 arg2\nCommands available:\nbuild <input string> <output file>\naccess <saved wt> <access indices>\nwhere <access indices> is a file containing the indices, each 0-indexed on a separate line\nrank <saved wt> <rank queries>\nwhere <rank queries> is a file containing the queries of format <c>\t<i> where i is 0-indexed\nselect <saved wt> <select queries>\nwhere select queries is of the form of rank queries above"
