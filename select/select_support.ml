@@ -1,7 +1,7 @@
 type t = Rank_support.t
 
 let create r = r  
-  
+
 let select b s bv i =
   let rec bsearch low high =
     if low > high then None else
@@ -11,9 +11,9 @@ let select b s bv i =
       else if rank > i || (rank = i && (b <> Bitv.get bv @@ mid - 1)) then bsearch low @@ mid - 1
       else bsearch (mid + 1) high in
   bsearch 1 @@ Bitv.length bv
-  
+
 let select1 = select true
 
 let select0 = select false
 
-let overhead s = Rank_support.overhead s
+let overhead = Rank_support.overhead

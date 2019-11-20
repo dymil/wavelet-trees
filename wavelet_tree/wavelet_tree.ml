@@ -30,7 +30,7 @@ module Make(Ord: Set.OrderedType) =
         if Ord.compare arr.(mid) c = 0 then Some mid
         else if Ord.compare arr.(mid) c > 0 then bsearch arr low mid c
         else bsearch arr (mid + 1) high c
-        
+
     (** This is the naive partition-based construction algorithm. *)
     let build s =
       let arr = List.sort_uniq Ord.compare s |> List.to_seq |> Array.of_seq in
@@ -55,7 +55,7 @@ module Make(Ord: Set.OrderedType) =
        alphabet = arr;
        root = make_tree list (Bitv.create len false) 0 (Array.length arr)
       }
-      
+
     let access wt i =
       let rec access_h tree i = match tree with
         | Leaf n -> wt.alphabet.(n)
@@ -88,7 +88,7 @@ module Make(Ord: Set.OrderedType) =
            match wt.root with
            | Leaf n -> if c' = n then Some i else None
            | Node _ -> rank_h wt.root 0 (Array.length wt.alphabet) i
-                     
+
     let select wt c i =
       let c' = bsearch wt.alphabet 0 (Array.length wt.alphabet) c in
       Option.bind c'
