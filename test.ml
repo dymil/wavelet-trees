@@ -1,7 +1,7 @@
 open OUnit2
    
 let bvs = let gen_bv n =
-            Random.self_init ();
+            Random.init @@ int_of_float @@ Unix.time ();
             Bitv.init n @@ fun _ -> Random.bool () and
               sizes = [1; 2; 3; 4; 5; 8; 16; 29; 33; 65; 128; 200; 256; 400; 512; 1000; 1024]
           @ List.init 50 (fun _ -> Random.int 800000) in
@@ -38,7 +38,7 @@ let test_rank ctx = Random.self_init ();
           (Bitv.length bv) (1000. *. (Unix.gettimeofday() -. start)) @@ Rank_support.overhead r
       ) naives
 let test_select ctx =
-  Random.self_init ();
+  Random.init @@ int_of_float @@ Unix.time ();
   Printf.printf "\n==Select==\n";
   let naive_select bv i b =
     let rec help idx acc =
@@ -88,11 +88,11 @@ let char_lists =
   let num = 60 in
   let sigmas= [1; 2; 3; 4; 5] @ List.init num (fun _ -> 1 + Random.int 255)
     and
-      strlens = [1; 2; 3; 4; 5] @ List.init num (fun _ -> 1 + Random.int 2000) in
+      strlens = [1; 2; 3; 4; 5] @ List.init num (fun _ -> 1 + Random.int 40000) in
   List.fold_left2 (fun acc sigma n -> (sigma, List.init n (fun _ -> Char.chr @@ Random.int sigma))::acc) [] sigmas strlens
   
 let test_wt_rand_rank ctx =
-  Random.self_init ();
+  Random.init @@ int_of_float @@ Unix.time ();
   Printf.printf "\n==Rank==\n";
   let naive_rank l c i =
     let rec rank_h l' j acc = match l' with
@@ -117,10 +117,10 @@ let test_wt_rand_rank ctx =
               | None -> 0 in
             let res = CharWT.rank wt c i in
             OUnit2.assert_equal ~printer:string_of_int naive @@ opt_to_int res) rands;
-      Printf.printf "List length= %d, sigma=%d, time=%f ms\n" (List.length l) sigma @@ 1000. *. (Unix.gettimeofday() -. start)) naives
+      Printf.printf "List length=%d, sigma=%d, time=%f ms\n" (List.length l) sigma @@ 1000. *. (Unix.gettimeofday() -. start)) naives
 
 let test_wt_rand_select ctx =
-  Random.self_init ();
+  Random.init @@ int_of_float @@ Unix.time ();
   Printf.printf "\n==Select==\n";
   let naive_select l c i =
     let rec help l' idx acc = match l' with
@@ -147,7 +147,7 @@ let test_wt_rand_select ctx =
                 | Some n -> n
                 | None -> -1 in
               OUnit2.assert_equal ~printer:string_of_int (opt_to_int naive) (opt_to_int res)) rands;
-        Printf.printf "List length= %d, sigma=%d, time=%f ms\n" (List.length l) sigma @@ 1000. *. (Unix.gettimeofday() -. start)) naives
+        Printf.printf "List length=%d, sigma=%d, time=%f ms\n" (List.length l) sigma @@ 1000. *. (Unix.gettimeofday() -. start)) naives
 
 let suite =
   "suite">:::
