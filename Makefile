@@ -30,4 +30,4 @@ wt: rank_support.cmx select_support.cmx wavelet_tree.cmx wt.ml
 .PHONY: clean
 
 clean:
-	rm -rf *.cmo *.cmi *.cmx *.o test.exe
+	rm -rf *.cmo *.cmi *.cmx *.o test.exe wt.exe
