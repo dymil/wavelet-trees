@@ -100,4 +100,6 @@ let rank1 r bv j =
     
 let rank0 r bv i = i - rank1 r bv i
               
-let overhead r = length r.r_s + length r.r_b + length r.r_p
+let overhead r =
+  let round_up_to_int_bits n = (n + Sys.int_size - 1) / Sys.int_size * Sys.int_size in
+  round_up_to_int_bits (length r.r_s) + round_up_to_int_bits (length r.r_b) + round_up_to_int_bits (length r.r_p)
