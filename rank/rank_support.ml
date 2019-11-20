@@ -1,7 +1,7 @@
 type t = {
     r_s : Bitv.t;
     r_b : Bitv.t;
-    r_p : Bitv.t ;
+    r_p : Bitv.t
   }
 
 open Bitv
