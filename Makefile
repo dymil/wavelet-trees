@@ -27,7 +27,7 @@ wavelet_tree.cmx: wavelet_tree/wavelet_tree.ml rank_support.cmx select_support.c
 wt: rank_support.cmx select_support.cmx wavelet_tree.cmx wt.ml
 	ocamlfind ocamlopt -g -linkpkg -package Bitv str.cmxa $^ -o $@
 
-.PHONY: clean
+.PHONY: clean all
 
 clean:
 	rm -rf *.cmo *.cmi *.cmx *.o test.exe wt.exe
